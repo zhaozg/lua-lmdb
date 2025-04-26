@@ -1,7 +1,7 @@
 
 W	= -W -Wall -Wno-unused-parameter -Wbad-function-cast -Wuninitialized
 THREADS = -pthread
-OPT     = -O2 -g
+OPT     = -Og -g
 INCS    = -I/usr/local/include/luajit-2.1 -I./liblmdb
 LIBS    = -L/usr/local/lib -lluajit-5.1
 CFLAGS	= $(THREADS) $(OPT) $(W) $(XCFLAGS) $(INCS)
