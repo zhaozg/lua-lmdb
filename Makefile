@@ -1,10 +1,12 @@
 
 W	= -W -Wall -Wno-unused-parameter -Wbad-function-cast -Wuninitialized
 THREADS = -pthread
-OPT     = -Og -g
-INCS    = -I/usr/local/include/luajit-2.1 -I./liblmdb
-LIBS    = -L/usr/local/lib -lluajit-5.1
-CFLAGS	= $(THREADS) $(OPT) $(W) $(XCFLAGS) $(INCS)
+OPT     = -Og -g -fPIC
+LUALIBS = $(shell pkg-config -libs luajit)
+LUAINCS = $(shell pkg-config --cflags luajit)
+INCS    = $(LUAINCS) -I./liblmdb
+LIBS    = $(LUALIBS)
+CFLAGS	= $(THREDS) $(OPT) $(W) $(XCFLAGS) $(INCS)
 
 .PHONY: all clean doc
 
