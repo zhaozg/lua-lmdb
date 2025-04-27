@@ -1161,6 +1161,48 @@ lmdb_cursor_count(lua_State *L)
   return lmdb_pusherror(L, rc);
 }
 
+
+/***
+Get key/data pairs.
+@function pairs
+@treturn iterator
+@usage
+  local cursor = dbi:cursor_open()
+  for key, value in cursor:pairs() do
+    print(key, value)
+  end
+*/
+static int lmdb_cursor_next(lua_State *L)
+{
+  lmdb_cursor *cursor = (lmdb_cursor *)luaL_checkudata(L, lua_upvalueindex(1), LUA_LMDB_CURSOR);
+  MDB_val key, val;
+ 
+  int rc = mdb_cursor_get(cursor->cursor, &key, &val, MDB_NEXT);
+  if (rc == MDB_SUCCESS) {
+      lua_pushlstring(L, (const char *)key.mv_data, key.mv_size);
+      lua_pushlstring(L, (const char *)val.mv_data, val.mv_size);
+      return 2;
+  }
+
+  return lmdb_pusherror(L, rc);
+}
+
+static int lmdb_cursor_pairs(lua_State *L)
+{
+  lmdb_cursor *cursor = (lmdb_cursor *)luaL_checkudata(L, 1, LUA_LMDB_CURSOR);
+
+  if (cursor->cursor == NULL) {
+    lua_pushnil(L);
+    lua_pushstring(L, "Invalid cursor");
+    return 2;
+  }
+
+  lua_pushvalue(L, 1);
+  lua_pushcclosure(L, lmdb_cursor_next, 1);
+
+  return 1;
+}
+
 static void
 auxiliar_newclass(lua_State *L, const char *classname, const luaL_Reg *func)
 {
@@ -1258,8 +1300,9 @@ static const luaL_Reg cursor_methods[] = {
   { "put",        lmdb_cursor_put   },
   { "del",        lmdb_cursor_del   },
   { "count",      lmdb_cursor_count },
-  { "__gc",      lmdb_cursor_close },
+  { "pairs",      lmdb_cursor_pairs },
 
+  { "__gc",       lmdb_cursor_close },
   { "__tostring", auxiliar_tostring },
   { NULL,         NULL              }
 };

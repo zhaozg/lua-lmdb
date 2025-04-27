@@ -36,12 +36,18 @@ print(dbi)
 -- 读取数据
 local cursor = assert(dbi:cursor_open())
 repeat
-  local key, val = cursor:get()
-  print(key, val)
-until key == nil
+  local k, v = cursor:get()
+  print(k, v)
+until k == nil
 
 print(cursor:count())
 print(cursor:count(), 10)
+
+cursor = assert(dbi:cursor_open())
+for k, v in cursor:pairs() do
+    print(k, v)
+end
+
 txn:abort()
 
 -- 关闭环境
