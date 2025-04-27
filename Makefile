@@ -4,11 +4,12 @@ THREADS = -pthread
 OPT     = -Og -g -fPIC
 LUALIBS = $(shell pkg-config -libs luajit)
 LUAINCS = $(shell pkg-config --cflags luajit)
+CMODDIR = $(shell pkg-config luajit --variable=INSTALL_CMOD)
 INCS    = $(LUAINCS) -I./liblmdb
 LIBS    = $(LUALIBS)
 CFLAGS	= $(THREDS) $(OPT) $(W) $(XCFLAGS) $(INCS)
 
-.PHONY: all clean doc
+.PHONY: all clean doc install
 
 all: lmdb.so
 
@@ -20,6 +21,9 @@ test:  lmdb.so test.lua
 
 doc:
 	ldoc -c config.ld lmdb.c
+
+install: lmdb.so
+	sudo cp lmdb.so $(CMODDIR)/lmdb.so
 
 clean:
 	rm -rf lmdb.so* *.o doc

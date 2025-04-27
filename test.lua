@@ -40,6 +40,7 @@ repeat
   print(k, v)
 until k == nil
 
+cursor = assert(dbi:cursor_open())
 print(cursor:count())
 print(cursor:count(), 10)
 
